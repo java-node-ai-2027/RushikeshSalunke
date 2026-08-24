@@ -1,0 +1,16 @@
+{
+  "name": "my-node-project",
+  "version": "1.0.0",
+  "description": "My Node.js web project",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.19.0"
+  }
+}
