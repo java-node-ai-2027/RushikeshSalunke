@@ -122,5 +122,8 @@ console.log('-------------Js------------');
 // -------------------------------
 // -- day tuesday 25-aug-26---  after SSH configuration --------------
 
+let date = new Date();
+console.log(date.toString());
+
  
 
