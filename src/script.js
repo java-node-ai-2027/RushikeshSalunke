@@ -125,6 +125,8 @@ console.log('-------------Js------------');
 let date = new Date();
 console.log(date.toString());
 console.log("the "+date.setUTCMonth());
+console.log(date.getFullYear());
+
 
  
 
