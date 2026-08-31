@@ -531,6 +531,7 @@ const numbers = [10, 20, 30, 40, 50];
 //     { name: "B", age: 25 },
 //     { name: "C", age: 30 }
 // ];
+
 // // const result = users.reduce((obj, user) => {
 // //     obj[user.name] = user.age;
 // //     return obj;
