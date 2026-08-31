@@ -553,12 +553,295 @@ const numbers = [10, 20, 30, 40, 50];
 //     console.log(`${id}: ${name}`);
 // }
 
-const title = document.querySelector("#title");
-console.log(title);
-//title.textContent = "Welcome";
+// const title = document.querySelector("#title");
+// console.log(title);
+// //title.textContent = "Welcome";
 
 
+//------------------------------------------------------------
 
+// let students = [
+//     { id: 1, name: "A", marks: 80 },
+//     { id: 2, name: "B", marks: 90 },
+//     { id: 3, name: "C", marks: 70 }
+// ];
+
+// console.log(students.filter(s => s.marks < 80));
+// console.log(students);
+// console.log(Object.keys(students));
+// console.log(Object.values(students));
+// console.log(Object.entries(students));
+
+
+// try {
+//     let result = riskyOperation();
+// } catch (error) {
+//     console.log("Something went wrong");
+// } finally {
+//     console.log("Always runs this block ");
+// }
+
+// function riskyOperation(){
+//     console.log('Johnson Line LAC');
+// };
+
+
+//----------------000000000==================
+// console.log("A");
+
+// setTimeout(() => {
+//     console.log("B");
+// }, 2000);
+// console.log("C");
+
+// console.log("1");
+// setTimeout(()=>{
+//     console.log("2");
+// },3000);
+// console.log('3');
+
+
+// //--------
+//   let ourpromise  = new Promise((resolve,reject)=>{
+//     const success = false ;
+//     if(success){
+//         resolve("data got 100%")
+//     }else{
+//         reject("not received ")
+//     }
+//   });
+
+// ourpromise
+//       .then((result)=>{
+//      console.log(result);
+//      })
+//      .catch((error)=>{
+//       console.log(result);
+//      });
+
+//----------------------------------------------------
+// class stud {
+//     constructor(name , age){
+//         this.name = name ;
+//         this.age = age ;    
+//     }
+//     welcome(){
+//         console.log(`Hello welcome ${this.name} now u become ${this.age} year old `);
+//     }
+// }
+// let s1 = new stud("priti",24);
+// s1.welcome();
+
+// //2 inheritance 
+// class animal{
+//     walk(){
+//         console.log("animal is running");
+//     }
+// }
+// class Dog extends animal{
+//     bark(){
+//         console.log("dog may bite");
+//     }
+// }
+// let obj1 = new Dog();
+// obj1.walk();
+//obj1.bark();
+
+// class animal{
+//     bark(){
+//         console.log("animal is running");
+//     }
+// }
+// class Dog extends animal{
+//     bark(){
+//         console.log("dog may bite");
+//     }
+// }
+// let obj1 = new Dog();
+// obj1.bark();
+
+//
+// const items = document.querySelectorAll(".text");
+//  items.forEach((item) => {
+//     item.addEventListener("click", function() {
+//     this.style.color = "crimson";
+//     })
+//   })
+
+///////
+// const btn = document.querySelector("#myBtn");
+// btn.addEventListener("click", () => {
+//   console.log("Button was clicked!");
+// });
+
+//console.log(username);
+
+
+//--------------AI base study format just for Understanding -----------------------------------------------
+
+// /**
+//  * ==========================================
+//  * TOPIC: READING & UNDERSTANDING EXISTING JS CODE
+//  * ==========================================
+//  * 
+//  * 💡 QUICK MENTAL CHECKLIST (5-STEP METHOD):
+//  * 1. PURPOSE   -> Manage employee records & simulate asynchronous API load.
+//  * 2. STRUCTURE -> Data Store -> Data Processing -> Async API Simulation -> DOM / Execution Flow
+//  * 3. DATA      -> Array of Employee Objects (id, name, role, salary, active)
+//  * 4. FLOW      -> Fetch Data -> Filter High Earners -> Transform -> Display Result
+//  * 5. DETAILS   -> Look for array methods (filter, map), async/await, and debugging breakpoints.
+//  */
+
+// // ==========================================
+// // 1. DATA STORE (Initial State)
+// // ==========================================
+// const rawEmployeeData = [
+//   { id: 101, name: "Rushi", role: "Developer", salary: 75000, active: true },
+//   { id: 102, name: "Amit", role: "Designer", salary: 48000, active: true },
+//   { id: 103, name: "Rahul", role: "QA Engineer", salary: 42000, active: false },
+//   { id: 104, name: "Priya", role: "Tech Lead", salary: 95000, active: true },
+//   { id: 105, name: "Neha", role: "DevOps", salary: 68000, active: true }
+// ];
+
+// // ==========================================
+// // 2. DATA PROCESSING FUNCTIONS (Pure Functions)
+// // ==========================================
+
+// /**
+//  * Filter employees earning above a threshold.
+//  * INPUT: employees (Array), threshold (Number) -> OUTPUT: Filtered Array
+//  */
+// function getHighSalaryEmployees(employees, threshold = 50000) {
+//   // Input validation check
+//   if (!Array.isArray(employees)) return [];
+
+//   return employees.filter(emp => emp.active && emp.salary > threshold);
+// }
+
+// /**
+//  * Transform employee objects into display-friendly summary strings.
+//  * INPUT: employees (Array) -> OUTPUT: Array of Strings
+//  */
+// function formatEmployeeSummaries(employees) {
+//   return employees.map(emp => `${emp.name} (${emp.role}) - $${emp.salary}`);
+// }
+
+// /**
+//  * Find a specific employee by ID.
+//  * INPUT: employees (Array), id (Number) -> OUTPUT: Object | undefined
+//  */
+// function findEmployeeById(employees, id) {
+//   return employees.find(emp => emp.id === id);
+// }
+
+// // ==========================================
+// // 3. ASYNCHRONOUS SIMULATION (API Layer)
+// // ==========================================
+
+// /**
+//  * Simulates fetching employee data from a backend server via Async/Await.
+//  * INPUT: None -> OUTPUT: Promise <Array>
+//  */
+// async function fetchRemoteEmployees() {
+//   console.log("⏳ Fetching employee records from network...");
+  
+//   return new Promise((resolve, reject) => {
+//     setTimeout(() => {
+//       const isSuccess = true; // Toggle to false to test catch block
+      
+//       if (isSuccess) {
+//         resolve(rawEmployeeData);
+//       } else {
+//         reject(new Error("Failed to fetch data from API."));
+//       }
+//     }, 1000);
+//   });
+// }
+
+// // ==========================================
+// // 4. MAIN CONTROLLER & EXECUTION FLOW
+// // ==========================================
+
+// async function runApplication() {
+//   console.log("🚀 Application Starting...");
+
+//   try {
+//     // STEP A: Fetch Data (Async Flow)
+//     const employees = await fetchRemoteEmployees();
+//     console.log(`✅ Loaded ${employees.length} records.`);
+
+//     // STEP B: Un-comment 'debugger;' to inspect variable states in DevTools!
+//     // debugger;
+
+//     // STEP C: Filter High Earners (> 50,000)
+//     const highEarners = getHighSalaryEmployees(employees, 50000);
+//     console.log(`📊 Found ${highEarners.length} active high earners.`);
+
+//     // STEP D: Transform to formatted summaries
+//     const summaries = formatEmployeeSummaries(highEarners);
+
+//     // STEP E: Display Output
+//     console.log("\n--- HIGH EARNER DIRECTORY ---");
+//     summaries.forEach((summary, index) => {
+//       console.log(`${index + 1}. ${summary}`);
+//     });
+
+//     // STEP F: Specific Search Demonstration
+//     const targetId = 104;
+//     const targetUser = findEmployeeById(employees, targetId);
+//     console.log(`\n🔍 Search Result for ID ${targetId}:`, targetUser?.name ?? "Not found");
+
+//   } catch (error) {
+//     console.error("❌ Error encountered in app execution:", error.message);
+//   } finally {
+//     console.log("\n🏁 Application execution completed.");
+//   }
+// }
+
+// // Execute the application flow
+// runApplication();
+
+
+//_________--------------------------//--------------------__-
+
+// async function getUsers() {
+//     const response = await fetch("https://jsonplaceholder.typicode.com/users");
+//     const users = await response.json();
+//     console.log(users);
+// }
+// getUsers();
+
+
+// async function getUsers() {
+//     const response = await fetch("https://jsonplaceholder.typicode.com/users");
+//     const users = await response.json();
+//     console.log(users);
+//     console.log(response.ok);
+//     const tres = users.filter(user=> user.id <= 5);
+//     console.log(tres);
+// }
+// getUsers();
+
+
+async function getyounguser(){
+    try {
+        let response = await fetch("https://jsonplaceholder.typicode.com/users");
+        if(!response.ok){
+            throw new Error(`request failed to fetch ${response.status}`);
+        }
+        const user = await response.json();
+        const young = user.filter(userr=>userr.id>=5);
+        const name = young.map(userr => userr.name);
+        return name ;
+    } catch (error) {
+        console.error("canot load the users ",error.message);
+        return [];
+    }
+}
+
+getyounguser().then(names =>{
+    console.log("fetched user names :",names);
+});
 
 
 
