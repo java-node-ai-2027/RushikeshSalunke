@@ -456,34 +456,106 @@ const numbers = [10, 20, 30, 40, 50];
 
 //--------------------------------------------------------
 
-const employees = [
-    {
-        id: 101,
-        name: "Rahul",
-        department: "IT",
-        salary: 50000,
-        skills: ["JS", "Node"],
-        active: true
-    },
-    {
-        id: 102,
-        name: "Amit",
-        department: "HR",
-        salary: 40000,
-        skills: ["Recruitment"],
-        active: false
-    },
-    {
-        id: 103,
-        name: "Priya",
-        department: "IT",
-        salary: 60000,
-        skills: ["JS", "React"],
-        active: true
-    }
-];
+// const employees = [
+//     {
+//         id: 101,
+//         name: "Rahul",
+//         department: "IT",
+//         salary: 50000,
+//         skills: ["JS", "Node"],
+//         active: true
+//     },
+//     {
+//         id: 102,
+//         name: "Amit",
+//         department: "HR",
+//         salary: 40000,
+//         skills: ["Recruitment"],
+//         active: false
+//     },
+//     {
+//         id: 103,
+//         name: "Priya",
+//         department: "IT",
+//         salary: 60000,
+//         skills: ["JS", "React"],
+//         active: true
+//     }
+// ];
 
 
+//--------------------------------------------------------- DOM ---------------------------
+// let a = document.querySelector("h1");
+// let a = document.querySelector("h1").innerHTML = 'jay maharashtra ';
+// a.innerHTML = "hello";
+
+// a.style.color = 'pink';
+// a.style.backgroundColor = 'black'
+// a.addEventListener('click',function(){
+//  console.log('welome event listner');
+//  a.style.color = "yellow";
+//  a.style.backgroundColor = "black";
+//  a.innerHTML = "Ramdwarar jagat Jalgaon  and having a Millions of Devotiee";
+// });
+
+// //----------------------------------------  for Dom 
+// let flag = 0 ;
+// let bulb  = document.querySelector("#id1");
+// let butttnnnn = document.querySelector("button");
+// butttnnnn.addEventListener("click",function(){
+//     if(flag == 0){
+//     bulb.style.backgroundColor = 'yellow' ;
+//     console.log("light lagla ");
+//     flag = 1 ;
+//     }else{
+//         bulb.style.backgroundColor = 'black' ;
+//         console.log("light OFF ");
+//         flag = 0 ;
+//     }
+// })
+//-------------------------------------------------------------------------
+
+// let arr = [1,2,3,4,5,6,7,8,9,10]; 
+// // let sum= 0 ;
+// // for(let a of arr){
+// //     sum += a;   
+// //     console.log(sum); 
+// // };
+
+// let summ = arr.reduce((acc,curr)=> acc+curr,1 );
+// console.log(summ);
+
+//--------------------------------------------------
+// const users = [
+//     { name: "A", age: 20 },
+//     { name: "B", age: 25 },
+//     { name: "C", age: 30 }
+// ];
+// // const result = users.reduce((obj, user) => {
+// //     obj[user.name] = user.age;
+// //     return obj;
+// // }, {});
+// // console.log(result);
+
+// const res = users.reduce((a,b)=>{
+//     a[b.name] = b.age;
+//     return a;
+// },{});
+// console.log(res);
+// //------------------map 
+// const u1 =new Map();
+// u1.set("uu1","rushi");
+// u1.set('uu2',"priti");
+// u1.set("uu3","shruti");
+// console.log(u1.get('uu1'));
+// console.log(u1.get('uu2'));
+// for(let [id,name ] of u1){
+//     console.log(`${id}: ${name}`);
+// }
+
+const title = document.querySelector("#title");
+console.log(title);
+//title.textContent = "Welcome";
 
 
 
