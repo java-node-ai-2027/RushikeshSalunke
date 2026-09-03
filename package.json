@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "My Node.js web project",
   "type": "module",
-  "main": "src/server.js",
+  "main": "src/script.js",
   "scripts": {
     "start": "node src/server.js"
   },
@@ -11,6 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.19.0"
+    "axios": "^1.19.0",
+    "cd": "^0.3.3",
+    "express": "^5.2.1",
+    "figlet": "^1.11.4",
+    "joke": "^0.0.1-1",
+    "one-liner-joke": "^1.2.2",
+    "oneline": "^2.0.0"
   }
 }
