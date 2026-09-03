@@ -1,125 +1,159 @@
-console.log('-------------Js------------');
-// let user = {
-//     name :'ram',
-//     age : 20 ,
-//     email:'ram23@gmail.com'
-// }
-// user.greet = function() {
-//     console.log(this.name);
-// };
-// let user2 ={
-//     name : 'priti',
-//     age : 25
-// };
-// user2.greet = function() {
-//     console.log(this.name+" "+this.age);
-// };
-// console.log(user);
-// console.log(user2);
-
-// //---------------------------------------
-// function User(name, age) {
-//   this.name = name;
-//   this.age = age;
-// }
-// let user1 = new User("Rahul", 25);
-// const use2 = new User("priya",25);
-// console.log(user1.name);
-// console.log(use2.name+" "+use2.age);
-
-
-// User.prototype.greet = function(){
-//     console.log();
-// }
-//--------------------------------------------------------------------
-// console.log('import and export of functon');
-
-//import { Addition } from "./mathHelper";
-//import { mathHelper } from './mathHelper';
-//import { mathHelper } from './mathHelper.js';
-
-// let sum = Addition(5,19);
-// console.log(Addition(1,2));
-// console.log('import and export of function');
-
-// //import { Addition } from './mathHelper.js';
-
-// let summ = Addition(5, 19);
-// console.log(summ); // Logs 24
-// console.log(Addition(1, 2)); // Logs 3
-
-
-// import { add} from "./mathHelper.js";
-// console.log("Addition:", add(2, 3));
-// import {multiply } from "./mathHelper.js"
-// console.log("Multiplication:", multiply(9,2 ));
-
-// import sub from "./mathHelper.js";
-// console.log(sub(100,50));
-
-
-//------------------------------------------------------------
-// let Emp = {
-//     // name : 'priti',
-//     // age : 26 ,
-//     isHappy(){
-//         console.log(this.name+"  is Totally Happy ");
-//     }
-// };
-// let E1 = Object.create(Emp);
-// Emp.name = "rahul";
-// E1.isHappy();
-//-------------------------------------------------------
-// class Thik{
-//     constructor(name , age){
-//         this.name = name ;
-//         this.age = age ;
-//     }
-//      gotsal(){
-//         console.log('The sal creadited in morning  to person -> '+this.name);
-//     }         
-// }
-//  let u1 = new Thik();
-//  console.log(u1);
-//  let u2 = new Thik();
-//  const u3 = new Thik('shruti',27);
-//  console.log(u3);
-//  u3.gotsal(); 
-
-//  class Thimkitive extends Thik{
-//      constructor(name , age ,ctc){
-//         super(name,age);
-//         this.ctc = ctc; 
-//      }
-//      gotmarried(){
-//         console.log("the emp name  is "+this.name+" and he is a Top Performer ");
-//         }
-//  }
- 
-//  let CEO = new Thimkitive('swati',25 ,40_000);
-//  console.log(CEO);
-//  CEO.gotsal();
-//  CEO.gotmarried();
-//------------------------------------------------------
-// class SBI{
-//  #balance = 0;
-//  deposit(amt){
-//     if(amt>500){
-//         this.#balance +=amt ;
-//     }else{ console.log('amt is very less ')}
-//  }
-//  showbal(){
-//     return this.#balance;
-//  }
-// }
-// let Bank = new SBI();
-// Bank.deposit(450);
-// console.log(Bank.showbal());
-// // #not allow bcoz private   
-
-
-//-------------------------------------------- upto day 24-aug-2026-----------------
-// ------------------------------------------- day tuesday 25-aug-26-----------------
+// ---------------- Object Literals(``<--this is literal) & Method   
+const user1 = {
+  name: 'Ram',
+  age: 20,
+  email: 'ram23@gmail.com',
+  greet() {
+    console.log(`Hello, my name is ${this.name}`);
+    console.log("hello "+this.name+" .");
+    
+  }
+};
 
 
 
+const user2 = {
+  name: 'Priti',
+  age: 25,
+  email: 'priti25@gmail.com',
+  greet() {
+    console.log(`Name: ${this.name}, Age: ${this.age}`);
+  }
+};
+
+user1.greet();
+user2.greet();
+
+
+// -------- Constructor Functions & Prototypes
+
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+
+// shared method
+Person.prototype.greet = function () {
+  console.log(`Hello, I am ${this.name} and I am ${this.age} years old.`);
+};
+const rahul = new Person("Rahul", 25);
+const priya = new Person("Priya", 25);
+
+rahul.greet();
+priya.greet();
+
+//  Prototype Inheritance (Object.create)--------------------------
+const employeeBase = {
+  isHappy() {
+    console.log(`${this.name} is totally happy!`);
+  }
+};
+
+// Create a new object inheriting from employeeBase
+const emp1 = Object.create(employeeBase);
+emp1.name = "Rahul";
+emp1.isHappy();
+
+
+// ES6 Classes & Inheritance
+class Employee {
+  constructor(name, age) {
+    this.name = name || 'notavailable';
+    this.age = age || 0;
+  }
+  notifySalary() {
+    console.log(`Salary credited in the morning to: ${this.name}`);
+  }
+}
+
+// Derived subclass extending Employee
+class TopPerformer extends Employee {
+  constructor(name, age, ctc) {
+    super(name, age); //  point to parent construc
+    this.ctc = ctc;
+  }
+  showDetails() {
+    console.log(`${this.name} is Top Performer with ${this.ctc}.`);
+  }
+}
+
+const em1 = new Employee('Shruti', 27);
+em1.notifySalary();
+
+const em2 = new TopPerformer('Swati', 25, 40000);
+em2.notifySalary();
+em2.showDetails();
+
+
+// Encapsulation
+class BankAccount {
+  #balance = 0; //# donate private 
+
+  deposit(amount) {
+    if (amount >= 500) {
+      this.#balance += amount;
+      console.log(`Successfully deposited: ${amount}`);
+    } else {
+      console.log('Deposit failed: Minimum deposit amount is 500.');
+    }
+  }
+
+  getBalance() {
+    return this.#balance;
+  }
+}
+
+const myAccount = new BankAccount();
+myAccount.deposit(450); // Will show error message
+myAccount.deposit(1000); // Successfully deposits
+console.log(`Current Balance: ${myAccount.getBalance()}`);
+
+
+/*
+==================== output is here ====================
+Hello, my name is Ram
+hello Ram .
+Name: Priti, Age: 25
+Hello, I am Rahul and I am 25 years old.
+Hello, I am Priya and I am 25 years old.
+Rahul is totally happy!
+Salary credited in the morning to: Shruti
+Salary credited in the morning to: Swati
+Swati is a Top Performer with a CTC of 40000.
+Deposit failed: Minimum deposit amount is 500.
+Successfully deposited: 1000
+Current Balance: 1000
+PS C:\Users\ADMIN\Desktop\Thinkitive\learning\RushikeshSalunke\src>   
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ignore it 
+   export const add = (a, b) => a + b;
+   export const multiply = (a, b) => a * b;
+   export default function subtract(a, b) { return a - b; };
+   import sub, { add, multiply } from "./mathHelper.js";
+
+   console.log("Addition:", add(2, 3));
+   console.log("Multiplication:", multiply(9, 2));
+   console.log("Subtraction:", sub(100, 50));
+*/
