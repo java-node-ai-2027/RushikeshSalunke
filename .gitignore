@@ -9,6 +9,7 @@ node_modules/
 # Logs
 *.log
 npm-debug.log*
+temp_auto_push.bat
 yarn-debug.log*
 yarn-error.log*
 
@@ -17,8 +18,9 @@ yarn-error.log*
 Thumbs.db
 
 # VS Code settings (optional)
-.vscode/
 
 # Temporary files
 *.tmp
-*.temp
+*.temp.env
+.gitignore
+branch_structure.json
