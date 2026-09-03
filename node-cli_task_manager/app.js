@@ -1,150 +1,88 @@
-// const fs = require("fs");
-// const data = fs.readFileSync("tasks.json", "utf-8");
-// console.log(data);
-
-// let fs2 =require("fs");
-// let data2 =fs2.writeFileSync("tasks.json", JSON.stringify([]))
-// console.log(data2);
-
-
-
-
-//-------------------------------------------------------------------------
-// console.log("Task manager cli small proj and above is the fs");
-// console.log(process.argv);
-
-// console.log("Commanda are :", process.argv[3]);
-// console.log("Task are:", process.argv[4]);//undefined bcoz not available 
-
-// const res = process.argv[3];
-// console.log(res);
-// console.log('-----------------the process arg are  below --------------');
-// console.log(process.argv[0]);
-// console.log(process.argv[1]);
-// console.log(process.argv[2]);
-// console.log(process.argv[3]);
-// console.log(process.argv[4]);
-
-// //----------------------------------------
-// const fs = require("fs");
-// const command = process.argv[2];
-// const input = process.argv[3];
-
-// // let fs = require("fs");
-// // let res =process.argv[2];
-// // let ip=process.argv[3];
-
-// let tasks = 
-// [
-//     {
-//         "id": 1,
-//         "title": "Learn Node.js",
-//         "completed": false
-//     },
-//     {
-//         "id": 2,
-//         "title": "Learn JavaScript",
-//         "completed": false
-//     }
-// ];
-
-// // Read tasks from file
-// if (fs.existsSync("tasks.json")) {
-//     tasks = JSON.parse(fs.readFileSync("tasks.json", "utf8"));
-// }
-// // if(fs.existsSync("tasks.json")){
-// //     tasks = JSON.parse(fs.readFileSync("tasks.json"));
-// // }
-
-// // ADD TASK
-// if (command === "add") {
-//     if (!input) {
-//         console.log("Please enter a task.");
-//         process.exit();
-//     }
-//     tasks.push(input);
-//     fs.writeFileSync("tasks.json", JSON.stringify(tasks, null, 2));
-//     console.log("Task added!");
-// }
-
-
-///////---------------------------------------------
-
 const fs = require("fs");
+const path = require("path");
+
+const TASKS_FILE = path.join(__dirname, "tasks.json");
 const command = process.argv[2];
 const input = process.argv[3];
 
-// Read tasks from tasks.json
+// Read existing tasks from storage
 let tasks = [];
-
-if (fs.existsSync("tasks.json")) {
-    tasks = JSON.parse(
-        fs.readFileSync("tasks.json", "utf8")
-    );
-}
-
-// ADD
-if (command === "add") {
-
-    if (!input) {
-        console.log("Please enter a task.");
-        process.exit();
-    }
-
-    tasks.push({
-        id: tasks.length + 1,
-        title: input,
-        completed: false
-    });
-
-    fs.writeFileSync(
-        "tasks.json",
-        JSON.stringify(tasks, null, 2)
-    );
-
-    console.log("Task added!");
-}
-
-// LIST
-else if (command === "list") {
-
-    if (tasks.length === 0) {
-        console.log("No tasks found.");
-    } else {
-
-        tasks.forEach(task => {
-            console.log(`${task.id}. ${task.title}`);
-        });
-
+if (fs.existsSync(TASKS_FILE)) {
+    try {
+        const fileData = fs.readFileSync(TASKS_FILE, "utf8");
+        tasks = JSON.parse(fileData);
+    } catch (error) {
+        console.error("Error reading tasks.json. Initializing empty task list.");
+        tasks = [];
     }
 }
 
-// DELETE
-else if (command === "delete") {
-
-    const number = Number(input);
-
-    if (!number || number > tasks.length) {
-        console.log("Invalid task number.");
-        process.exit();
-    }
-
-    tasks.splice(number - 1, 1);
-
-    fs.writeFileSync(
-        "tasks.json",
-        JSON.stringify(tasks, null, 2)
-    );
-
-    console.log("Task deleted!");
+// Helper to save tasks to JSON
+function saveTasks(tasksList) {
+    fs.writeFileSync(TASKS_FILE, JSON.stringify(tasksList, null, 2), "utf8");
 }
 
-// NO COMMAND
-else {
+// Command Handler
+switch (command) {
+    case "add": {
+        if (!input) {
+            console.log("Error: Please provide a task description.");
+            console.log('Usage: node app.js add "Task title"');
+            process.exit(1);
+        }
 
-    console.log("Available commands:");
-    console.log('node app.js add "task"');
-    console.log("node app.js list");
-    console.log("node app.js delete 1");
+        const newTask = {
+            id: tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1,
+            title: input,
+            completed: false
+        };
 
+        tasks.push(newTask);
+        saveTasks(tasks);
+        console.log(`Task added successfully! (ID: ${newTask.id})`);
+        break;
+    }
+
+    case "list": {
+        if (tasks.length === 0) {
+            console.log("No tasks found.");
+        } else {
+            console.log("\n--- Task List ---");
+            tasks.forEach(task => {
+                const status = task.completed ? "[x]" : "[ ]";
+                console.log(`${task.id}. ${status} ${task.title}`);
+            });
+            console.log("-----------------\n");
+        }
+        break;
+    }
+
+    case "delete": {
+        const taskId = Number(input);
+
+        if (!taskId || isNaN(taskId)) {
+            console.log("Error: Please provide a valid task ID number to delete.");
+            console.log("Usage: node app.js delete <task_id>");
+            process.exit(1);
+        }
+
+        const initialLength = tasks.length;
+        tasks = tasks.filter(task => task.id !== taskId);
+
+        if (tasks.length === initialLength) {
+            console.log(`Task with ID ${taskId} not found.`);
+        } else {
+            saveTasks(tasks);
+            console.log(`Task ${taskId} deleted successfully!`);
+        }
+        break;
+    }
+
+    default: {
+        console.log("Usage Guide:");
+        console.log('  node app.js add "Task title"   - Add a new task');
+        console.log("  node app.js list               - List all tasks");
+        console.log("  node app.js delete <task_id>   - Delete a task by ID");
+        break;
+    }
 }
