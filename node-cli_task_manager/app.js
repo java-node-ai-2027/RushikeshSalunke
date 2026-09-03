@@ -85,4 +85,24 @@ switch (command) {
         console.log("  node app.js delete <task_id>   - Delete a task by ID");
         break;
     }
+
 }
+
+
+
+
+
+
+//output 
+
+/*
+ *node app.js
+Usage Guide:
+  node app.js add "Task title"   - Add a new task
+  node app.js list               - List all tasks
+  node app.js delete <task_id>   - Delete a task by ID
+   
+ */
+
+
+
