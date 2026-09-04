@@ -3,34 +3,51 @@
 // console.log(process.argv[1]);
 // console.log(process.argv[2]);
 // console.log(process.argv[3]);
+//===========================================import -=====================
+import { createsfile } from "./commands/creates.js";
+import  { readfile } from "./commands/read.js";
+import { write } from "./commands/write.js"
+import { deletefile } from "./commands/deletefile.js";
+import { renamefile }  from "./commands/renamefile.js";
+import { createfolder } from "./commands/createfolder.js";
+
 
 //============================================= create ====---------------
+const cmd = process.argv[2]; // file 
+const fname = process.argv[3]; // name // old name  
+const data = process.argv[4]; //  new name 
 
-// import { createsfile } from "./commands/creates.js";
 
-// const cmd = process.argv[2]; // file 
-// const fname = process.argv[3]; // name 
-// if (cmd === "create") {
-//     await createsfile(fname);
-// }
+if (cmd === "creates") {
+    await createsfile(fname);
+}
 
 //-------------------------------------read -------------------------
-// import  { readfile } from "./commands/read.js"
 
-// const cmd = process.argv[2]; 
-// const fname = process.argv[3];
-// if(cmd === "readfile"){
-//     await readfile(fname);
-// }
-
+if(cmd === "readfile"){
+    await readfile(fname);
+}
 //-------------------------------------write  -------------------------
-// import { writefile } from "./commands/writefile.js";
-import { write } from "./commands/write.js"
-const cmd = process.argv[2];
-const fname = process.argv[3];
-const data = process.argv[4];
-
 
 if(cmd === "write"){
     await write(fname,data);
+};
+
+/// ============================================================================================
+
+if(cmd === "delete"){
+    await deletefile(fname);
+};
+
+//=====================================================================================
+
+if(cmd === "rename"){
+    await renamefile(fname);
+};
+
+
+//=--------------------------------------------------------------------------------
+
+if(cmd ===  "createfolder"){
+    await createfolder(fname);
 };
