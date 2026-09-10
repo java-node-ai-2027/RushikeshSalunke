@@ -9,7 +9,7 @@ export async function connectDB() {
     try {
         await client.connect();
         db = client.db("file_notes_db");
-        console.log("Connected to MongoDB successfully");
+        console.log("Connected to MongoDB successfully now can preceed ");
         return db;
     } catch (err) {
         console.error("MongoDB connection error:", err.message);

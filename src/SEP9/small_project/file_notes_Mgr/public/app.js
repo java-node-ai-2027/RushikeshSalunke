@@ -1,4 +1,4 @@
-// Load and display files
+// Load , display file  
 async function loadFiles() {
     const res = await fetch("/api/files");
     const data = await res.json();
@@ -49,7 +49,7 @@ async function loadNotes() {
     const container = document.getElementById("notes");
     container.innerHTML = "";
     if (!data.notes || data.notes.length === 0) {
-        container.innerHTML = "<p>No notes in MongoDB yet.</p>";
+        container.innerHTML = "<p>No notes in MongoDB vro.</p>";
         return;
     }
     data.notes.forEach(note => {
@@ -70,7 +70,7 @@ async function createNote() {
     const title = document.getElementById("noteTitle").value.trim();
     const content = document.getElementById("noteContent").value.trim();
     if (!title || !content) {
-        alert("Please enter both title and content");
+        alert("enter title ,content then only i proceed ");
         return;
     }
     await fetch("/api/notes", {
@@ -85,7 +85,7 @@ async function createNote() {
 
 // Delete note from MongoDB
 async function deleteNote(id) {
-    if (!confirm("Delete this note?")) return;
+    if (!confirm("really Delete this note?")) return;
     await fetch(`/api/notes/${id}`, { method: "DELETE" });
     loadNotes();
 }
