@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple OCR App</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+            color: black ;
+            background-color: purple;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 8px;
+
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Simple OCR App</h1>
+<hr>
+    <input type="file" id="fileInput" style="text-align: center ">
+    <br>
+    <button onclick="uploadFile()"> Upload File  </button>
+    <button onclick="getDocuments()"> See Extracted Text</button>
+    <div id="message"></div>
+
+    <div id="result"></div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            if (!fileInput.files[0]) {
+                alert("Please select a file");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            document.getElementById("message").innerText =
+                "Uploading...";
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById("message").innerText =
+                data.message;
+        }
+
+
+        
+        async function getDocuments() {
+            const response = await fetch("/documents")
+            const documents = await response.json();
+            const result = document.getElementById("result");
+            result.innerHTML = "";
+            documents.forEach(function(document) {
+                const div = document.createElement("div");
+                div.innerHTML = `
+                    <hr>
+                    <h3>${document.filename}</h3>
+                    <p>${document.text}</p>
+                    <small>${document.createdAt}</small>
+                `;
+                result.appendChild(div);
+            });}
+    </script>
+
+</body>
+</html>
