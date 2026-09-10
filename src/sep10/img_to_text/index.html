@@ -1,40 +1,36 @@
+html
 <!DOCTYPE html>
 <html>
 <head>
     <title>Simple OCR App</title>
-
     <style>
         body {
             font-family: Arial;
             margin: 40px;
-            color: black ;
             background-color: purple;
+            color: white;
         }
-
         button {
             margin-top: 10px;
             padding: 8px;
-
         }
-
         #result {
             margin-top: 20px;
         }
     </style>
 </head>
-
 <body>
-
     <h1>Simple OCR App</h1>
-<hr>
-    <input type="file" id="fileInput" style="text-align: center ">
+    <hr>
+    <input type="file" id="fileInput">
     <br>
-    <button onclick="uploadFile()"> Upload File  </button>
-    <button onclick="getDocuments()"> See Extracted Text</button>
+    <button onclick="uploadFile()">Upload File</button>
+    <button onclick="getDocuments()">See Extracted Text</button>
     <div id="message"></div>
-
     <div id="result"></div>
-
+    
+    
+    //js
     <script>
         async function uploadFile() {
             const fileInput = document.getElementById("fileInput");
@@ -44,35 +40,47 @@
             }
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
-            document.getElementById("message").innerText =
-                "Uploading...";
-            const response = await fetch("/upload", {
-                method: "POST",
-                body: formData
-            });
-            const data = await response.json();
-            document.getElementById("message").innerText =
-                data.message;
+            document.getElementById("message").innerText = "Uploading and processing...";
+            try {
+                const response = await fetch("/upload", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                console.log("Upload response:", data);
+                document.getElementById("message").innerText = data.message;
+            } catch (error) {
+                console.log("Upload error:", error);
+                document.getElementById("message").innerText = "Upload failed";
+            }
         }
 
-
-        
         async function getDocuments() {
-            const response = await fetch("/documents")
-            const documents = await response.json();
-            const result = document.getElementById("result");
-            result.innerHTML = "";
-            documents.forEach(function(document) {
-                const div = document.createElement("div");
-                div.innerHTML = `
-                    <hr>
-                    <h3>${document.filename}</h3>
-                    <p>${document.text}</p>
-                    <small>${document.createdAt}</small>
-                `;
-                result.appendChild(div);
-            });}
+            try {
+                const response = await fetch("/documents");
+                const documents = await response.json();
+                console.log("Documents received:", documents);
+                const result = document.getElementById("result");
+                result.innerHTML = "";
+                if (documents.length === 0) {
+                    result.innerHTML = "<p>No OCR documents found.</p>";
+                    return;
+                }
+                documents.forEach(function(document) {
+                    const div = document.createElement("div");
+                    div.innerHTML = `
+                        <hr>
+                        <h3>${document.filename}</h3>
+                        <p>${document.text}</p>
+                        <small>${document.createdAt}</small>
+                    `;
+                    result.appendChild(div);
+                });
+            } catch (error) {
+                console.log("Get documents error:", error);
+                document.getElementById("result").innerText = "Could not get documents";
+            }
+        }
     </script>
-
 </body>
 </html>
