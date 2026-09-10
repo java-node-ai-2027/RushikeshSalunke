@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File & Notes Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>File & Notes Manager</h1>
+
+        <!-- File Section (Local Storage) -->
+        <section>
+            <h2>Save File (Local)</h2>
+            <input id="fileName" type="text" placeholder="File name (e.g. notes.txt)">
+            <textarea id="fileContent" placeholder="File content"></textarea>
+            <button onclick="createFile()">Save File</button>
+        </section>
+
+        <section>
+            <h2>Files</h2>
+            <div id="files"></div>
+        </section>
+
+        <!-- Notes Section (MongoDB) -->
+        <section>
+            <h2>Save Note (MongoDB)</h2>
+            <input id="noteTitle" type="text" placeholder="Note title">
+            <textarea id="noteContent" placeholder="Note content"></textarea>
+            <button onclick="createNote()">Save Note</button>
+        </section>
+
+        <section>
+            <h2>Notes</h2>
+            <div id="notes"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
