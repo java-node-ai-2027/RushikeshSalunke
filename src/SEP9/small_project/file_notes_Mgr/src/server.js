@@ -1,8 +1,11 @@
 
+
 import http from "http";
+
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import { ObjectId } from "mongodb";
 import { connectDB, getDB } from "./db.js";
 
@@ -10,13 +13,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.resolve(__dirname, "../public");
 const storageDir = path.resolve(__dirname, "../storage");
 
-// Helper: send JSON response
 function sendJSON(res, status, data) {
     res.writeHead(status, { "Content-Type": "application/json" });
     res.end(JSON.stringify(data));
 }
 
-// Helper: read request body
 function getBody(req) {
     return new Promise((resolve) => {
         let body = "";
@@ -26,23 +27,19 @@ function getBody(req) {
                 resolve(body ? JSON.parse(body) : {});
             } catch {
                 resolve({});
-            }
-        });
+            } });
     });
 }
 
 const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname;
-
     try {
-        // 1. FILE APIs (Local storage)
         if (pathname === "/api/files" && req.method === "GET") {
             await fs.mkdir(storageDir, { recursive: true });
             const files = await fs.readdir(storageDir);
             return sendJSON(res, 200, { files });
         }
-
         if (pathname === "/api/files" && req.method === "POST") {
             const body = await getBody(req);
             if (!body.name) {
@@ -53,7 +50,6 @@ const server = http.createServer(async (req, res) => {
             await fs.writeFile(filePath, body.content || "", "utf8");
             return sendJSON(res, 201, { message: "File created" });
         }
-
         if (pathname.startsWith("/api/files/") && req.method === "DELETE") {
             const fileName = path.basename(decodeURIComponent(pathname.replace("/api/files/", "")));
             const filePath = path.join(storageDir, fileName);
@@ -61,22 +57,20 @@ const server = http.createServer(async (req, res) => {
             return sendJSON(res, 200, { message: "File deleted" });
         }
 
-        // 2. NOTE APIs (MongoDB)
+        //mongo db 
         if (pathname === "/api/notes" && req.method === "GET") {
             const notes = await getDB().collection("notes").find().sort({ _id: -1 }).toArray();
             return sendJSON(res, 200, { notes });
         }
-
         if (pathname === "/api/notes" && req.method === "POST") {
             const body = await getBody(req);
             if (!body.title || !body.content) {
-                return sendJSON(res, 400, { message: "Title and content required" });
+                return sendJSON(res, 400, { message: "Title and content !!???" });
             }
             const note = { title: body.title, content: body.content, date: new Date() };
             const result = await getDB().collection("notes").insertOne(note);
             return sendJSON(res, 201, { note: { _id: result.insertedId, ...note } });
         }
-
         if (pathname.startsWith("/api/notes/") && req.method === "DELETE") {
             const id = pathname.replace("/api/notes/", "");
             if (!ObjectId.isValid(id)) {
@@ -85,8 +79,6 @@ const server = http.createServer(async (req, res) => {
             await getDB().collection("notes").deleteOne({ _id: new ObjectId(id) });
             return sendJSON(res, 200, { message: "Note deleted" });
         }
-
-        // 3. STATIC FILES (Frontend: index.html, style.css, app.js)
         const fileToServe = pathname === "/" ? "index.html" : pathname.slice(1);
         const staticPath = path.join(publicDir, fileToServe);
 
@@ -99,16 +91,14 @@ const server = http.createServer(async (req, res) => {
         } catch {
             return sendJSON(res, 404, { message: "Page not found" });
         }
-
     } catch (err) {
         console.error("Server error:", err);
         return sendJSON(res, 500, { message: "Server error" });
-    }
-});
+    } });
 
 const PORT = 3000;
-
 async function start() {
+    //imp in try bcoz without conntn how cwe perform operations 
     try {
         await connectDB();
         server.listen(PORT, () => {
@@ -118,5 +108,4 @@ async function start() {
         console.error("Could not start server:", err.message);
     }
 }
-
 start();
