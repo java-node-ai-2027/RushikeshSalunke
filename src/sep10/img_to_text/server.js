@@ -1,4 +1,3 @@
-//we can use import also 
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -6,8 +5,7 @@ const Busboy = require("busboy");
 const { MongoClient } = require("mongodb");
 const { createWorker } = require("tesseract.js");
 
-
-//---------------db connected vroo  
+// --------------- DB connection ---------------
 const PORT = 3000;
 const mongoUrl = "mongodb://127.0.0.1:27017";
 const client = new MongoClient(mongoUrl);
@@ -17,81 +15,48 @@ async function connectDatabase() {
     await client.connect();
     const database = client.db("ocr_database");
     collection = database.collection("ocr_documents");
-    console.log("MongoDB connected brooo  ");
+    console.log("MongoDB connected");
 }
-//--------------------------------------------------------------------------------
 
-const server = http.createServer(async function(req, res) {
-    if (req.url === "/" && req.method === "GET") {
-        const filePath = path.join(__dirname, "index.html");
-
-        fs.readFile(filePath, function(error, data) {
-            if (error) {
-                res.writeHead(500);
-                res.end("Could not open HTML file");
-                return;
-            }
-
-            res.writeHead(200, {
-                "Content-Type": "text/html"
-            });
-        res.end(data);
-        });
-        return;
-    }
-    if (req.url === "/upload" && req.method === "POST") {
-        uploadFile(req, res);
-        return;
-    }
-    if (req.url === "/documents" && req.method === "GET") {
-        await getDocuments(req, res);
-        return;
-    }
-    res.writeHead(404);
-    res.end("Page not found");
-});
-
-async function startServer() {
-    try {
-        await connectDatabase();
-        server.listen(PORT, function() {
-            console.log(`Server running at http://localhost:${PORT}`);
-        });
-    } catch (error) {
-        console.log("Could not start server");
-        console.log(error);
-    }
-}
-startServer();
-
-//------------------------------------------------------------------------------
-
-
+// --------------- Upload + OCR ---------------
 function uploadFile(req, res) {
     const busboy = Busboy({ headers: req.headers });
     let filePath;
     let fileName;
     let fileWritePromise;
 
-    busboy.on("file", function(fieldName, file, info) {
-       
-        console.log("File received 100.... % ");
+    busboy.on("file", function (fieldName, file, info) {
+        console.log("File received");
+
         fileName = info.filename;
         console.log("Filename:", fileName);
         console.log("Type:", info.mimeType);
 
-        filePath = path.join(__dirname, "uploads", fileName);
+        // make sure uploads folder exists
+        const uploadsDir = path.join(__dirname, "uploads");
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        filePath = path.join(uploadsDir, fileName);
+
         const writeStream = fs.createWriteStream(filePath);
         file.pipe(writeStream);
 
-        fileWritePromise = new Promise(function(resolve, reject) {
+        fileWritePromise = new Promise(function (resolve, reject) {
             writeStream.on("finish", resolve);
             writeStream.on("error", reject);
         });
     });
 
-    busboy.on("finish", async function() {
+    busboy.on("finish", async function () {
         try {
+            if (!fileWritePromise) {
+                res.writeHead(400, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ message: "No file was uploaded" }));
+                return;
+            }
+
             await fileWritePromise;
             console.log("File saved:", filePath);
 
@@ -101,60 +66,134 @@ function uploadFile(req, res) {
             const text = result.data.text;
             await worker.terminate();
 
-            console.log("OCR text:");
-            console.log(text);
+            console.log("OCR text extracted");
 
             await collection.insertOne({
-                filename: fileName,
+                fileName: fileName,
                 text: text,
                 createdAt: new Date()
             });
-
             console.log("OCR data saved in MongoDB");
 
+            // clean up temp file
             fs.unlinkSync(filePath);
 
-            res.writeHead(200, {
-                "Content-Type": "application/json"
-            });
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ message: "Upload done and OCR done" }));
 
-            res.end(JSON.stringify({
-                message: "File upload done and OCR done is visible on terminal "
-            }));
         } catch (error) {
             console.log("Upload error:", error);
-
-            res.writeHead(500, {
-                "Content-Type": "application/json"
-            });
-
-            res.end(JSON.stringify({
-                message: "Something went wrong"
-            }));
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ message: "Something went wrong" }));
         }
     });
 
     req.pipe(busboy);
 }
 
+// --------------- Get documents (SERVER-SIDE) ---------------
+// async function getDocuments(req, res) {
+//     try {
+//         console.log("=== /documents route hit ===");
+
+//         const documents = await collection
+//             .find()
+//             .sort({ createdAt: -1 })
+//             .toArray();
+
+//         console.log("Found documents count:", documents.length);
+
+//         res.writeHead(200, { "Content-Type": "application/json" });
+//         res.end(JSON.stringify(documents));
+
+//     } catch (error) {
+//         console.log("Get documents error:", error);
+//         res.writeHead(500, { "Content-Type": "application/json" });
+//         res.end(JSON.stringify({
+//             message: "Could not get documents",
+//             error: error.message
+//         }));
+//     }
+// }
+
+const { ObjectId } = require("mongodb");   // add this at the top with other imports
+
 async function getDocuments(req, res) {
     try {
-        const documents = await collection.find().sort({ createdAt: -1 }).toArray();
-        console.log("Documents from MongoDB:", documents);
+        // parse query string, e.g. /documents?id=65f1a...
+        const urlObj = new URL(req.url, `http://${req.headers.host}`);
+        const id = urlObj.searchParams.get("id");
 
-        res.writeHead(200, {
-            "Content-Type": "application/json"
-        });
+        let query = {};
+        if (id) {
+            query = { _id: new ObjectId(id) };   // ✅ only this one document
+        }
 
+        const documents = await collection
+            .find(query)
+            .sort({ createdAt: -1 })
+            .toArray();
+
+        res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(documents));
+
     } catch (error) {
         console.log("Get documents error:", error);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ message: "Could not get documents" }));
+    }
+}
 
-        res.writeHead(500, {
-            "Content-Type": "application/json"
+
+
+// --------------- Server ---------------
+const server = http.createServer(function (req, res) {
+
+    // Home page
+    if (req.url === "/" && req.method === "GET") {
+        const filePath = path.join(__dirname, "index.html");
+        fs.readFile(filePath, function (error, data) {
+            if (error) {
+                res.writeHead(500);
+                res.end("Cannot open HTML file");
+                return;
+            }
+            res.writeHead(200, { "Content-Type": "text/html" });
+            res.end(data);
+        });
+        return;
+    }
+
+    // Upload route
+    if (req.url === "/upload" && req.method === "POST") {
+        uploadFile(req, res);
+        return;
+    }
+
+    // Get documents route
+    if (req.url === "/documents" && req.method === "GET") {
+        getDocuments(req, res);
+        return;
+    }
+
+    // 404
+    res.writeHead(404);
+    res.end("Cannot perform this request");
+});
+
+// --------------- Start ---------------
+async function startServer() {
+    try {
+        await connectDatabase();
+
+        server.listen(PORT, function () {
+            console.log(`Server running at http://localhost:${PORT}`);
         });
 
-        res.end(JSON.stringify({
-            message: "Could not get documents"
-        }));
-    }}
+    } catch (error) {
+        console.log("Cannot start server");
+        console.log(error);
+    }
+}
+
+startServer();

@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,14 +8,21 @@ html
             margin: 40px;
             background-color: purple;
             color: white;
-            width : full ;
+            width: 100%;
         }
         button {
             margin-top: 10px;
             padding: 8px;
+            cursor: pointer;
         }
         #result {
             margin-top: 20px;
+        }
+        #result div {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -29,55 +35,164 @@ html
     <button onclick="getDocuments()">See Extracted Text</button>
     <div id="message"></div>
     <div id="result"></div>
-    
-    
-    //js
-    <script>
+
+    <!-- <script>
         async function uploadFile() {
             const fileInput = document.getElementById("fileInput");
+
             if (!fileInput.files[0]) {
-                alert("Please select a file  then click ");
+                alert("Please select a file");
                 return;
             }
+
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
-         document.getElementById("message").innerText = "Uploading waiit  have patience ";
+
+            document.getElementById("message").innerText =
+                "Uploading... please wait";
+
             try {
                 const response = await fetch("/upload", {
                     method: "POST",
                     body: formData
                 });
+
                 const data = await response.json();
-                console.log("Uploaded  responses..., :", data);
+                console.log("Upload response:", data);
+
                 document.getElementById("message").innerText = data.message;
+
             } catch (error) {
-                console.log("Upload error!!!!!!!!  :", error);
+                console.log("Upload error:", error);
                 document.getElementById("message").innerText = "Upload failed";
             }
         }
 
         async function getDocuments() {
-        try {
+            try {
+                console.log("Getting documents...");
+
                 const response = await fetch("/documents");
                 const documents = await response.json();
-                console.log("Documents received 100% :", documents);
+
+                console.log("Documents:", documents);
+
                 const result = document.getElementById("result");
                 result.innerHTML = "";
-                if (documents.length === 0) {
-                    result.innerHTML = "<p>No OCR documents found.</p>";
+
+                if (!Array.isArray(documents) || documents.length === 0) {
+                    result.innerHTML = "<p>No documents found.</p>";
                     return;
                 }
-                documents.forEach(function(document) {
+
+                // ✅ renamed to `doc` so we don't shadow the global `document`
+                documents.forEach(function (doc) {
                     const div = document.createElement("div");
-                    div.innerHTML = `<hr> <h3>${document.filename}</h3> 
-                                           <p>${document.text}</p>
-                                            <small>${document.createdAt}</small> `;
+
+                    const filename = doc.filename || doc.fileName || "Unknown file";
+
+                    div.innerHTML = `
+                        <hr>
+                        <h3>File: ${filename}</h3>
+                        <p>${doc.text}</p>
+                        <small>${doc.createdAt}</small>
+                    `;
+
                     result.appendChild(div);
                 });
+
             } catch (error) {
                 console.log("Get documents error:", error);
+                document.getElementById("result").innerText =
+                    "Could not get documents";
             }
         }
-    </script>
+    </script> -->
+
+    <script>
+    let lastUploadedId = null;   // ✅ remember which file we just uploaded
+
+    async function uploadFile() {
+        const fileInput = document.getElementById("fileInput");
+
+        if (!fileInput.files[0]) {
+            alert("Please select a file");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        document.getElementById("message").innerText =
+            "Uploading... please wait";
+
+        try {
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+            console.log("Upload response:", data);
+
+            document.getElementById("message").innerText = data.message;
+
+            // ✅ store the id returned by the server
+            lastUploadedId = data.id;
+
+            // ✅ clear old results so the UI is not confusing
+            document.getElementById("result").innerHTML = "";
+
+        } catch (error) {
+            console.log("Upload error:", error);
+            document.getElementById("message").innerText = "Upload failed";
+        }
+    }
+
+    async function getDocuments() {
+        try {
+            if (!lastUploadedId) {
+                document.getElementById("result").innerText =
+                    "Please upload a file first.";
+                return;
+            }
+
+            // ✅ only ask for the last uploaded document
+            const response = await fetch("/documents?id=" + lastUploadedId);
+            const documents = await response.json();
+
+            console.log("Documents:", documents);
+
+            const result = document.getElementById("result");
+            result.innerHTML = "";
+
+            if (!Array.isArray(documents) || documents.length === 0) {
+                result.innerHTML = "<p>No documents found.</p>";
+                return;
+            }
+
+            documents.forEach(function (doc) {
+                const div = document.createElement("div");
+
+                const filename = doc.filename || doc.fileName || "Unknown file";
+
+                div.innerHTML = `
+                    <hr>
+                    <h3>File: ${filename}</h3>
+                    <p>${doc.text}</p>
+                    <small>${doc.createdAt}</small>
+                `;
+
+                result.appendChild(div);
+            });
+
+        } catch (error) {
+            console.log("Get documents error:", error);
+            document.getElementById("result").innerText =
+                "Could not get documents";
+        }
+    }
+</script>
+
 </body>
 </html>
