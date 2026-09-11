@@ -6,6 +6,8 @@ const Busboy = require("busboy");
 const { MongoClient } = require("mongodb");
 const { createWorker } = require("tesseract.js");
 
+
+//---------------db connected vroo  
 const PORT = 3000;
 const mongoUrl = "mongodb://127.0.0.1:27017";
 const client = new MongoClient(mongoUrl);

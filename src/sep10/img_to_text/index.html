@@ -9,6 +9,7 @@ html
             margin: 40px;
             background-color: purple;
             color: white;
+            width : full ;
         }
         button {
             margin-top: 10px;
@@ -35,31 +36,31 @@ html
         async function uploadFile() {
             const fileInput = document.getElementById("fileInput");
             if (!fileInput.files[0]) {
-                alert("Please select a file");
+                alert("Please select a file  then click ");
                 return;
             }
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
-            document.getElementById("message").innerText = "Uploading and processing...";
+         document.getElementById("message").innerText = "Uploading waiit  have patience ";
             try {
                 const response = await fetch("/upload", {
                     method: "POST",
                     body: formData
                 });
                 const data = await response.json();
-                console.log("Upload response:", data);
+                console.log("Uploaded  responses..., :", data);
                 document.getElementById("message").innerText = data.message;
             } catch (error) {
-                console.log("Upload error:", error);
+                console.log("Upload error!!!!!!!!  :", error);
                 document.getElementById("message").innerText = "Upload failed";
             }
         }
 
         async function getDocuments() {
-            try {
+        try {
                 const response = await fetch("/documents");
                 const documents = await response.json();
-                console.log("Documents received:", documents);
+                console.log("Documents received 100% :", documents);
                 const result = document.getElementById("result");
                 result.innerHTML = "";
                 if (documents.length === 0) {
@@ -68,17 +69,13 @@ html
                 }
                 documents.forEach(function(document) {
                     const div = document.createElement("div");
-                    div.innerHTML = `
-                        <hr>
-                        <h3>${document.filename}</h3>
-                        <p>${document.text}</p>
-                        <small>${document.createdAt}</small>
-                    `;
+                    div.innerHTML = `<hr> <h3>${document.filename}</h3> 
+                                           <p>${document.text}</p>
+                                            <small>${document.createdAt}</small> `;
                     result.appendChild(div);
                 });
             } catch (error) {
                 console.log("Get documents error:", error);
-                document.getElementById("result").innerText = "Could not get documents";
             }
         }
     </script>
