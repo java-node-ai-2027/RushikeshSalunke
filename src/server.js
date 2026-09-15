@@ -1,7 +1,9 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const Busboy = require("busboy");
+const sharp = require("sharp");
 const { MongoClient, ObjectId } = require("mongodb");
 const { createWorker } = require("tesseract.js");
 
@@ -36,14 +38,25 @@ async function connectDatabase() {
 function uploadFile(req, res) {
 
     const busboy = Busboy({
-        headers: req.headers
+        headers: req.headers,
+        limits: {
+            files: 1,
+            fileSize: 10 * 1024 * 1024
+        }
     });
 
     let filePath;
+    let ocrFilePath;
     let fileName;
     let fileWritePromise;
+    let uploadError;
 
     busboy.on("file", function (fieldName, file, info) {
+
+        if (fieldName !== "file" || fileWritePromise) {
+            file.resume();
+            return;
+        }
 
         console.log("File received");
 
@@ -60,7 +73,20 @@ function uploadFile(req, res) {
             });
         }
 
-        filePath = path.join(uploadsDir, fileName);
+        const extension = path.extname(info.filename).toLowerCase();
+        const allowedExtensions = [".png", ".jpg", ".jpeg", ".webp", ".bmp", ".avif"];
+        const isImageMimeType = info.mimeType.startsWith("image/") || info.mimeType === "application/octet-stream";
+
+        if (!isImageMimeType || !allowedExtensions.includes(extension)) {
+            uploadError = new Error("Only supported image files can be uploaded");
+            file.resume();
+            return;
+        }
+
+        filePath = path.join(
+            uploadsDir,
+            `${crypto.randomUUID()}${extension}`
+        );
 
         const writeStream = fs.createWriteStream(filePath);
 
@@ -72,13 +98,27 @@ function uploadFile(req, res) {
 
             writeStream.on("error", reject);
 
+            file.on("limit", function () {
+                reject(new Error("Image is larger than the 10 MB limit"));
+            });
+
+            file.on("error", reject);
+
         });
 
+    });
+
+    busboy.on("error", function (error) {
+        uploadError = error;
     });
 
     busboy.on("finish", async function () {
 
         try {
+
+            if (uploadError) {
+                throw uploadError;
+            }
 
             if (!fileWritePromise) {
 
@@ -98,17 +138,25 @@ function uploadFile(req, res) {
 
             console.log("File saved:", filePath);
 
+            ocrFilePath = `${filePath}.png`;
+            await sharp(filePath).png().toFile(ocrFilePath);
+
             // ---------------- OCR ----------------
 
             console.log("Starting OCR...");
 
-            const worker = await createWorker("eng+hin+mar");
+            let worker;
+            let text;
 
-            const result = await worker.recognize(filePath);
-
-            const text = result.data.text;
-
-            await worker.terminate();
+            try {
+                worker = await createWorker("eng+hin+mar");
+                const result = await worker.recognize(ocrFilePath);
+                text = result.data.text;
+            } finally {
+                if (worker) {
+                    await worker.terminate();
+                }
+            }
 
             console.log("OCR text extracted");
 
@@ -125,6 +173,7 @@ function uploadFile(req, res) {
 
             const insertResult = await collection.insertOne({
                 fileName: fileName,
+                ocrText: text,
                 deidentifiedText: deidentifiedText,
                 cleanedText: cleanedText,
                 createdAt: new Date()
@@ -132,9 +181,6 @@ function uploadFile(req, res) {
             });
 
             console.log("OCR data saved in MongoDB");
-
-            // Delete uploaded file after OCR
-            fs.unlinkSync(filePath);
 
             // ---------------- RESPONSE ----------------
 
@@ -165,6 +211,16 @@ function uploadFile(req, res) {
                 error: error.message
 
             }));
+
+        } finally {
+
+            if (filePath) {
+                await fs.promises.unlink(filePath).catch(function () {});
+            }
+
+            if (ocrFilePath) {
+                await fs.promises.unlink(ocrFilePath).catch(function () {});
+            }
 
         }
 
@@ -313,6 +369,11 @@ const server = http.createServer(function (req, res) {
 
 });
 
+server.on("error", function (error) {
+    console.error("Server error:", error);
+    process.exitCode = 1;
+});
+
 // ---------------- START SERVER ----------------
 
 async function startServer() {
@@ -336,7 +397,9 @@ async function startServer() {
 
         console.log("Cannot start server");
 
-        console.log(error);
+        console.error(error);
+        await client.close().catch(function () {});
+        process.exitCode = 1;
 
     }
 

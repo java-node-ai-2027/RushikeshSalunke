@@ -3,15 +3,19 @@
 
 async function deidentifyText(text) {
 
+    const requestOptions = {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        signal: AbortSignal.timeout(30_000)
+    };
+
     // Step 1: Ask Presidio Analyzer to find PII
     const analyzeResponse = await fetch(
         "http://localhost:5002/analyze",
         {
+            ...requestOptions,
             method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
 
             body: JSON.stringify({
                 text: text,
@@ -22,7 +26,7 @@ async function deidentifyText(text) {
 
     if (!analyzeResponse.ok) {
         throw new Error(
-            "Presidio Analyzer failed"
+            `Presidio Analyzer failed with HTTP ${analyzeResponse.status}`
         );
     }
 
@@ -34,11 +38,8 @@ async function deidentifyText(text) {
     const anonymizeResponse = await fetch(
         "http://localhost:5001/anonymize",
         {
+            ...requestOptions,
             method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
 
             body: JSON.stringify({
 
@@ -62,7 +63,7 @@ async function deidentifyText(text) {
 
     if (!anonymizeResponse.ok) {
         throw new Error(
-            "Presidio Anonymizer failed"
+            `Presidio Anonymizer failed with HTTP ${anonymizeResponse.status}`
         );
     }
 

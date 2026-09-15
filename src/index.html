@@ -81,6 +81,9 @@
             const fileInput =
                 document.getElementById("fileInput");
 
+            const uploadButton =
+                document.querySelector("button");
+
             if (!fileInput.files[0]) {
 
                 alert("Please select a file");
@@ -103,6 +106,8 @@
 
 
             try {
+
+                uploadButton.disabled = true;
 
                 const response = await fetch(
                     "/upload",
@@ -152,6 +157,10 @@
                 document.getElementById("message")
                     .innerText =
                     "Upload failed";
+
+            } finally {
+
+                uploadButton.disabled = false;
 
             }
 
