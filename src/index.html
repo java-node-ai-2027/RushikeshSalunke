@@ -1,14 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RushDoc</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <H1>Hello Welcome to JS</H1>
-</body>
-<script type="module" src="script.js"></script>
-</html>
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>OCR Image To Text</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>OCR Image To Text</h1>
+
+    <input
+        type="file"
+        id="fileInput"
+        accept="image/*"
+    >
+
+    <br><br>
+
+    <button onclick="uploadFile()">
+        Upload File
+    </button>
+
+    <button onclick="getDocuments()">
+        See Extracted Text
+    </button>
+
+    <div id="message"></div>
+
+    <div id="result"></div>
+
+
+    <script>
+
+        let lastUploadedId = null;
+
+
+        // ---------------- UPLOAD FILE ----------------
+
+        async function uploadFile() {
+
+            const fileInput =
+                document.getElementById("fileInput");
+
+            if (!fileInput.files[0]) {
+
+                alert("Please select a file");
+
+                return;
+            }
+
+
+            const formData = new FormData();
+
+            formData.append(
+                "file",
+                fileInput.files[0]
+            );
+
+
+            document.getElementById("message")
+                .innerText =
+                "Uploading... please wait";
+
+
+            try {
+
+                const response = await fetch(
+                    "/upload",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Upload response:",
+                    data
+                );
+
+
+                document.getElementById("message")
+                    .innerText =
+                    data.message;
+
+
+                // Store MongoDB ID
+                lastUploadedId = data.id;
+
+
+                console.log(
+                    "MongoDB ID:",
+                    lastUploadedId
+                );
+
+
+                document.getElementById("result")
+                    .innerHTML = "";
+
+
+            } catch (error) {
+
+                console.log(
+                    "Upload error:",
+                    error
+                );
+
+                document.getElementById("message")
+                    .innerText =
+                    "Upload failed";
+
+            }
+
+        }
+
+
+        // ---------------- GET DOCUMENTS ----------------
+
+        async function getDocuments() {
+
+            try {
+
+                if (!lastUploadedId) {
+
+                    document.getElementById("result")
+                        .innerText =
+                        "Please upload a file first.";
+
+                    return;
+                }
+
+
+                const response =
+                    await fetch(
+                        "/documents?id=" +
+                        lastUploadedId
+                    );
+
+
+                const documents =
+                    await response.json();
+
+
+                console.log(
+                    "Documents:",
+                    documents
+                );
+
+
+                const result =
+                    document.getElementById("result");
+
+
+                result.innerHTML = "";
+
+
+                if (
+                    !Array.isArray(documents) ||
+                    documents.length === 0
+                ) {
+
+                    result.innerHTML =
+                        "<p>No documents found.</p>";
+
+                    return;
+                }
+
+
+                // Show MongoDB data as JSON
+
+                documents.forEach(function (doc) {
+
+                    const div =
+                        document.createElement("div");
+
+
+                    const jsonData =
+                        JSON.stringify(
+                            doc,
+                            null,
+                            2
+                        );
+
+
+                    div.innerHTML = `
+
+                        <h2>MongoDB Data</h2>
+
+                        <pre>${jsonData}</pre>
+
+                    `;
+
+
+                    result.appendChild(div);
+
+                });
+
+
+            } catch (error) {
+
+                console.log(
+                    "Get documents error:",
+                    error
+                );
+
+
+                document.getElementById("result")
+                    .innerText =
+                    "Could not get documents";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>
