@@ -5,6 +5,10 @@ const Busboy = require("busboy");
 const { MongoClient, ObjectId } = require("mongodb");
 const { createWorker } = require("tesseract.js");
 
+const {deidentifyText} = require("./deidentify");
+const {cleanTextWithOllama} = require("./ollama")
+//const { deidentifyText } = require("./deidentify");
+
 // ---------------- CONFIG ----------------
 
 const PORT = 3000;
@@ -108,14 +112,21 @@ function uploadFile(req, res) {
 
             console.log("OCR text extracted");
 
+            // new updated added feature 
+            const deidentifiedText = await deidentifyText(text);
+            console.log("De-identification( Rendering) completed");
+
+            // and 1 more feature is 
+            const cleanedText = await cleanTextWithOllama(deidentifiedText);
+            console.log("ollama cleaning is   completed ")
+
+    
             // ---------------- SAVE TO MONGODB ----------------
 
             const insertResult = await collection.insertOne({
-
                 fileName: fileName,
-
-                text: text,
-
+                deidentifiedText: deidentifiedText,
+                cleanedText: cleanedText,
                 createdAt: new Date()
 
             });
