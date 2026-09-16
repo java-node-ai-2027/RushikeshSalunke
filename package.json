@@ -2,7 +2,7 @@
   "name": "my-node-project",
   "version": "1.0.0",
   "description": "My Node.js web project",
-  "type": "module",
+ "type": "module",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js"
