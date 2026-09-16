@@ -94,44 +94,4 @@ module.exports = {
 
 
 
-// async function cleanTextWithOllama(text) {
-//     const response = await fetch("http://localhost:11434/api/chat",{
-//         method: "POST",
-//         headers:{
-//             "Content-type":"application/json"
-//         },
-
-//         body:JSON.stringify({
-//             model:"qwen3:4b",
-//             messages:[
-//                 {
-//                 role: "system",
-//                 content: `
-//                 Your clean OCR text 
-
-//                 Rules are :
-//                 - fix speeling mistake caused by OCR 
-//                 - remove unnecceary noise 
-//                 - do not invent information 
-//                 - keep de-identified placeholder such as <person> and <email_address>.
-//                 - return only valid json  `
-
-//                 },
-//                 {
-//                     role: "user",
-//                     content:text
-
-//                 }
-//             ],stream: false
-//         })
-//     });
-
-// if(!response.ok){
-//     throw new Error("ollama request is get failed here");
-// }
-// const data =  await response.json();
-// return data.message.content;
-
-    
-// }
-// module.exports={ cleanTextWithOllama};
+ exports={ cleanTextWithOllama};
