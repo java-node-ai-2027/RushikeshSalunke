@@ -340,7 +340,7 @@ const server = http.createServer(function (req, res) {
         return;
     }
 
-    
+
     // UPLOAD
     if (
         req.url === "/upload" &&
@@ -376,6 +376,8 @@ server.on("error", function (error) {
 });
 
 // ---------------- START SERVER ----------------
+
+
 
 async function startServer() {
 
