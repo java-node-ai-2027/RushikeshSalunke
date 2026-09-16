@@ -340,6 +340,7 @@ const server = http.createServer(function (req, res) {
         return;
     }
 
+    
     // UPLOAD
     if (
         req.url === "/upload" &&
